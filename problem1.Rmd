@@ -1,0 +1,82 @@
+---
+title: "Iniciando a brincadeira com R"
+author: "Matheus Sampaio"
+date: "Sunday, October 19, 2014"
+output: html_document
+---
+
+### Questão 1
+  
+> Assista [esse vídeo](https://www.google.com/url?q=https%3A%2F%2Fwww.ted.com%2Fplaylists%2F56%2Fmaking_sense_of_too_much_data&sa=D&sntz=1&usg=AFQjCNHqXjveHlVueeoGc1_XzcGc6dfPfw) com atenção. Perceba que a grande pergunta que Hans Rosling tenta responder é: temos dois mundos separados; o mundo ocidental norte rico e o resto do mundo pobre? Talvez você precise pausar o vídeo para entender, assistir mais de uma vez, etc.
+
+Ele começa demostrando que as ideias preconcebidas influenciam no julgamento dos alunos. Em seguida ele mostra (através de um gráfico de bolhas) que nos anos 60 a ideia dos alunos sobre os países “em Desenvolvimento” poderia estar certa, porém já não se aplica ao ano de 2003. Hans analisa os dados sobre a distribuição de renda no mundo, onde demostra que aos poucos as pessoas estão saindo da faixa de pobreza.  
+Hans mostra os dados sobre a mortalidade infantil, onde chega a concluir que um pais mais rico possui uma mortalidade infantil menor, porém é preciso investir bastante. Em seguida ele comenta que os países podem ser “quebrados” em partes menores para que se possam analisar melhor e formar estratégias melhores, como por exemplo definir uma estratégia para combater a mortalidade infantil para a população pobre e outra estratégia para a população rica.  
+Comenta que dados como os apresentados são muito importantes e que vários deles estão sendo coletados. Porém ainda existe um trabalho a ser feito para que tais dados fiquem totalmente disponíveis. Onde ele mostra que a China está chegando perto da USA.
+
+### Questão 2
+
+> Qual o panorama geral dos profissionais de TI no Brasil sem ainda se preocupar com seus salários, apenas com sua localização, função, expertise...?
+
+A maioria dos profissionais de TI do Brasil estão na iniciativa privada e trabalhando na região Sudeste do Brasil, principalmente em Belo Horizonte. Metade dos profissionais atuantes não possuem uma Pós Graduação ou uma Certificação.
+
+```{r, echo=FALSE}
+salarios.ti.regioes <- read.csv("C:/Users/Matheus/git/analise-dados-2-p1/salarios-ti-regioes.csv")
+mosaicplot(table(salarios.ti.regioes$Regiao), main="Região dos profissionais de TI")
+pie(table(salarios.ti.regioes$Iniciativa.Privada.ou.Concursado), main="Iniciativa Privada ou Concursado")
+pie(table(salarios.ti.regioes$Pos.Graduacao.ou.Certificacao), main="Pos Graduação ou Certificação")
+```
+
+### Questão 3
+
+> Os salários estão bem distribuídos no intervalo que vai do menor salário para o maior salário? Ou será que os salários são muito concentrados em um intervalo pequeno de valores? Será que existem salários atípicos (outliers)? 
+
+Como podemos observar no Box Plot dos salários, a maioria está concentrado em um intervalo pequeno entre 2281 e 4233. Também podemos observar que existem um salário atípicos de 42120.
+
+```{r, echo=FALSE}
+summary(salarios.ti.regioes$Salario.Bruto)
+boxplot(salarios.ti.regioes$Salario.Bruto)
+```
+
+### Questão 4
+
+> A distribuição que você encontrou é a que você esperava sem olhar os dados? Se não é, você tem alguma suspeita da razão para a diferença? 
+
+Não, já que eu esperava um intervalo de salário mais alto. O fato de vários profissionais não terem formação acadêmica deve ter influenciado negativamente no valor dos salários.
+
+### Questão 5
+
+> É interessante ver a média (mean) salarial para cada região. Como resultado, apresente uma tabela com o nome da região e a sua média salarial ordenada da região com a maior média salarial para a menor. Se você tivesse usado a mediana (median) em vez da média como métrica de interesse, o resultado seria o mesmo? Analise a situação e justifique. Aproveite e salve esta tabela em um arquivo do tipo csv. 
+
+
+```{r, echo=FALSE}
+sort(tapply(salarios.ti.regioes$Salario.Bruto, salarios.ti.regioes$Regiao, mean), decreasing=TRUE)
+```
+
+Podemos ver abaixo como ficaria a tabela se tivesse usado a mediana.
+
+```{r, echo=FALSE}
+sort(tapply(salarios.ti.regioes$Salario.Bruto, salarios.ti.regioes$Regiao, median), decreasing=TRUE)
+```
+
+Podemos observar que o Nordeste “caiu” para quarto lugar. Isso se deve ao fato dos salários dos outros estados estarem mais agrupados e não terem grandes outliers como o caso do profissional que tem um salário de 42 mil no Nordeste.
+
+Para salvar o CSV:
+
+```{r, echo=TRUE}
+mean_salario = sort(tapply(salarios.ti.regioes$Salario.Bruto, salarios.ti.regioes$Regiao, mean), decreasing=TRUE)
+write.csv(mean_salario, "C:\\Users\\matheus\\git\\analise-dados-2-p1\\data.csv")
+```
+
+### Questão 6
+
+> Se um profissional de TI deseja ter um salario melhor, qual a(s) dica(s) para ele?
+
+Ele deve possuir uma Pós Graduação ou Certificado e estudar para passar em um Concurso para trabalhar no Centro-Oeste (Brasília).
+
+```{r, echo=FALSE}
+salario_greater_4000 = subset(salarios.ti.regioes, Salario.Bruto > 4000)
+sort(tapply(salario_greater_4000$Salario.Bruto, salario_greater_4000$Regiao, mean), decreasing=TRUE)
+centrooeste = subset(salarios.ti.regioes, Regiao == 'Centro-oeste')
+pie(table(centrooeste$Pos.Graduacao.ou.Certificacao))
+tapply(centrooeste$Salario.Bruto, centrooeste$Iniciativa.Privada.ou.Concursado, mean)
+```
